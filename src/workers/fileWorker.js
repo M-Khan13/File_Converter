@@ -18,6 +18,16 @@ const worker = new Worker(
 
     await deleteFile(inputPath);
 
+    // 🔥 Auto delete output file after 60 seconds
+    setTimeout(async () => {
+      try {
+        await deleteFile(outputPath);
+        console.log("Auto-deleted expired file:", outputPath);
+      } catch (err) {
+        console.error("Auto-delete error:", err.message);
+      }
+    }, 60 * 1000);
+
     return { outputPath };
   },
   { connection }

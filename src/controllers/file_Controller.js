@@ -20,9 +20,16 @@ export const uploadFile = async (req, res, next) => {
     }
 
     // 🔥 Add job to queue instead of converting
-    const job = await fileQueue.add("convert-docx", {
-      inputPath: req.file.path,
-    });
+  const job = await fileQueue.add(
+  "convert-docx",
+  { inputPath: req.file.path },
+  {
+    removeOnComplete: {
+      age: 60, // remove job after 60 seconds
+    },
+    removeOnFail: true,
+  }
+);
 
     console.log("Job added:", job.id);
 
