@@ -1,34 +1,30 @@
 import express from "express";
 import dotenv from "dotenv";
-
-dotenv.config();
-import fileRoutes from "./src/routes/fileRoutes.js";    
-const app = express();
-const PORT = process.env.PORT || 8000;
-
-app.use(express.json());
-app.use("/api/files", fileRoutes);
-app.use((req, res, next) => {
-  console.log(`Incoming Request: ${req.method} ${req.url}`);
-  next();
-});
-
-app.get("/", (req, res) => {
-  console.log("Root route hit");
-  res.send("File Converter API Running");
-});
-
 import path from "path";
 import { fileURLToPath } from "url";
 
+import fileRoutes from "./src/routes/fileRoutes.js";
+import { errorHandler } from "./src/middleware/error_Middleware.js";
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 8000;
+
+// Required for ES Modules to use __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Middleware
+app.use(express.json());
+
+// 🔥 Serve Frontend (IMPORTANT: before routes)
 app.use(express.static(path.join(__dirname, "client")));
 
+// API Routes
+app.use("/api/files", fileRoutes);
 
-import { errorHandler } from "./src/middleware/error_Middleware.js";
-
+// Global Error Handler
 app.use(errorHandler);
 
 app.listen(PORT, () => {
